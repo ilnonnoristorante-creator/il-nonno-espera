@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>IL NONNO — Panel Anfitrión</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f3ef;min-height:100vh;color:#1D2412}
+  .header{background:#8A5124;color:#EFE9D7;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+  .header-title{font-size:16px;font-weight:600;display:flex;align-items:center;gap:8px}
+  .header-time{font-size:12px;opacity:0.8}
+  .content{padding:16px;max-width:800px;margin:0 auto}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+  .stat{background:white;border-radius:12px;padding:14px;border:1px solid #e8e2d8}
+  .stat-val{font-size:28px;font-weight:700;color:#8A5124;line-height:1}
+  .stat-label{font-size:11px;color:#999;margin-top:4px}
+  .add-section{background:white;border-radius:12px;padding:14px;margin-bottom:16px;border:1px solid #e8e2d8}
+  .add-title{font-size:12px;color:#999;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px}
+  .add-row{display:flex;gap:8px;flex-wrap:wrap}
+  .add-row input{flex:1;min-width:120px;padding:9px 11px;font-size:13px;border:1px solid #e0e0e0;border-radius:8px;background:white;color:#1D2412;outline:none}
+  .add-row input:focus{border-color:#8A5124}
+  .add-row select{padding:9px 10px;font-size:13px;border:1px solid #e0e0e0;border-radius:8px;background:white;color:#1D2412;outline:none}
+  .btn-add{padding:9px 16px;background:#8A5124;color:white;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap}
+  .btn-add:hover{background:#7a4720}
+  .sec-label{font-size:11px;color:#999;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px}
+  .qcard{background:white;border-radius:12px;padding:14px 16px;margin-bottom:10px;border:1px solid #e8e2d8;transition:border 0.2s}
+  .qcard.is-next{border-color:#8A5124;border-width:2px}
+  .qcard.is-incomplete{border-color:#BA7517;border-width:2px;background:#FFFBF5}
+  .qcard.is-done{opacity:0.5}
+  .qcard-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+  .qcard-name{font-size:15px;font-weight:600}
+  .qcard-meta{font-size:12px;color:#888;margin-top:3px;display:flex;gap:10px;flex-wrap:wrap}
+  .badge{font-size:10px;padding:4px 10px;border-radius:999px;font-weight:600;white-space:nowrap}
+  .b-wait{background:#EFE9D7;color:#7a4720}
+  .b-soon{background:#415434;color:#EFE9D7}
+  .b-ready{background:#96A67D;color:#1D2412}
+  .b-seated{background:#f0f0f0;color:#888}
+  .b-absent{background:#FDECEA;color:#C0392B}
+  .b-incomplete{background:#FAEEDA;color:#854F0B}
+  .actions{display:flex;gap:6px;flex-wrap:wrap}
+  .btn-act{padding:8px 13px;font-size:12px;border-radius:8px;cursor:pointer;border:1px solid #e0e0e0;background:#f8f6f3;color:#333;display:flex;align-items:center;gap:5px;font-weight:500;white-space:nowrap;transition:all 0.15s}
+  .btn-act:hover{background:#ede9e3}
+  .btn-act:disabled{opacity:0.35;cursor:not-allowed}
+  .btn-act.verde{background:#415434;color:white;border-color:#415434}
+  .btn-act.verde:hover{background:#354529}
+  .btn-act.rojo{background:#FDECEA;color:#C0392B;border-color:#F5B7B1}
+  .btn-act.rojo:hover{background:#F5B7B1}
+  .btn-act.amber{background:#FAEEDA;color:#854F0B;border-color:#FAC775}
+  .btn-act.amber:hover{background:#FAC775}
+  .countdown{font-size:11px;background:rgba(0,0,0,0.08);padding:2px 6px;border-radius:4px}
+  .edit-row{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;padding-top:10px;border-top:1px solid #f0ede8}
+  .edit-row input,.edit-row select{padding:7px 9px;font-size:12px;border:1px solid #e0e0e0;border-radius:8px;background:white;color:#1D2412;flex:1;min-width:80px;outline:none}
+  .edit-row input:focus{border-color:#8A5124}
+  .incomplete-note{font-size:11px;color:#854F0B;background:#FAEEDA;border-radius:6px;padding:5px 9px;margin-top:8px;display:inline-flex;align-items:center;gap:5px}
+  .export-btn{padding:9px 16px;background:white;color:#1D2412;border:1px solid #e0e0e0;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px}
+  .export-btn:hover{background:#f5f3ef}
+  .empty{text-align:center;padding:3rem;color:#bbb;font-size:14px;background:white;border-radius:12px;border:1px solid #e8e2d8}
+  .loading{text-align:center;padding:3rem;color:#bbb;font-size:14px}
+  .top-actions{display:flex;gap:8px;align-items:center}
+  .pin-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:100}
+  .pin-card{background:white;border-radius:16px;padding:2rem;max-width:320px;width:90%;text-align:center}
+  .pin-title{font-size:18px;font-weight:600;margin-bottom:6px}
+  .pin-sub{font-size:13px;color:#888;margin-bottom:1.5rem}
+  .pin-input{width:100%;padding:12px;font-size:24px;text-align:center;letter-spacing:8px;border:2px solid #e0e0e0;border-radius:10px;outline:none;margin-bottom:1rem}
+  .pin-input:focus{border-color:#8A5124}
+  .pin-btn{width:100%;padding:12px;background:#8A5124;color:white;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer}
+  .pin-error{color:#C0392B;font-size:12px;margin-top:6px;display:none}
+</style>
+</head>
+<body>
+
+<!-- PIN de acceso -->
+<div class="pin-overlay" id="pin-overlay">
+  <div class="pin-card">
+    <div class="pin-title">IL NONNO</div>
+    <div class="pin-sub">Panel de anfitrión — ingresa el PIN</div>
+    <input class="pin-input" id="pin-input" type="password" maxlength="4" placeholder="····" onkeyup="checkPin(event)" />
+    <button class="pin-btn" onclick="checkPin()">Ingresar</button>
+    <div class="pin-error" id="pin-error">PIN incorrecto</div>
+  </div>
+</div>
+
+<div class="header">
+  <div class="header-title">🍕 IL NONNO — Panel de espera</div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <div class="header-time" id="header-time">—</div>
+    <button class="export-btn" onclick="exportCSV()">⬇ Exportar lista</button>
+  </div>
+</div>
+
+<div class="content">
+  <div class="stats">
+    <div class="stat"><div class="stat-val" id="st-total">0</div><div class="stat-label">En espera</div></div>
+    <div class="stat"><div class="stat-val" id="st-persons">0</div><div class="stat-label">Personas</div></div>
+    <div class="stat"><div class="stat-val" id="st-seated">0</div><div class="stat-label">Acomodados hoy</div></div>
+  </div>
+
+  <div class="add-section">
+    <div class="add-title">Registrar grupo manualmente</div>
+    <div class="add-row">
+      <input id="h-name" type="text" placeholder="Nombre y apellido" />
+      <input id="h-phone" type="tel" placeholder="Celular" style="max-width:150px" />
+      <select id="h-persons"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6</option></select>
+      <button class="btn-add" onclick="addManual()">+ Agregar</button>
+    </div>
+  </div>
+
+  <div class="sec-label">Grupos en espera</div>
+  <div id="queue-list"><div class="loading">Cargando lista...</div></div>
+</div>
+
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+  import { getDatabase, ref, onValue, push, update, remove, set } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
+
+  const PIN = '1608'; // PIN de acceso — cambiar antes de publicar
+  const SERVER = 'https://nodejs-production-f1afa.up.railway.app'; // se actualiza con URL del servidor
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCWMxLDo0FulEMO6nXx8E6bevE2RyW5LIU",
+    authDomain: "il-nonno-espera.firebaseapp.com",
+    databaseURL: "https://il-nonno-espera-default-rtdb.firebaseio.com",
+    projectId: "il-nonno-espera",
+    storageBucket: "il-nonno-espera.firebasestorage.app",
+    messagingSenderId: "88562605256",
+    appId: "1:88562605256:web:cc015af304ec7152d6d9fd"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  let queue = {};
+  let editingId = null;
+  let timers = {};
+  const MIN = 60000;
+
+  // PIN
+  window.checkPin = function(e) {
+    if (e && e.key !== 'Enter' && e.type === 'keyup') return;
+    const val = document.getElementById('pin-input').value;
+    if (val === PIN) {
+      document.getElementById('pin-overlay').style.display = 'none';
+      startListening();
+    } else {
+      document.getElementById('pin-error').style.display = 'block';
+      document.getElementById('pin-input').value = '';
+    }
+  };
+
+  function startListening() {
+    onValue(ref(db, 'queue'), (snap) => {
+      queue = snap.val() || {};
+      renderQueue();
+    });
+  }
+
+  function timeLeft(from, mins) {
+    if (!from) return 0;
+    const diff = mins * MIN - (Date.now() - from);
+    return diff > 0 ? Math.ceil(diff / 1000) : 0;
+  }
+
+  function statusBadge(s) {
+    return { wait: ['En espera','b-wait'], soon: ['Próximos','b-soon'], ready: ['Mesa lista','b-ready'], seated: ['Acomodados','b-seated'], absent: ['No aparecieron','b-absent'], incomplete: ['Grupo incompleto','b-incomplete'] }[s] || ['En espera','b-wait'];
+  }
+
+  async function api(endpoint, body) {
+    const res = await fetch(`${SERVER}/${endpoint}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    return res.json();
+  }
+
+  window.sendMsg = async function(id, type) {
+    const btn = document.getElementById(`btn-${type}-${id}`);
+    if (btn) { btn.disabled = true; btn.textContent = 'Enviando...'; }
+    await api('notify', { id, type });
+  };
+
+  window.addManual = async function() {
+    const name = document.getElementById('h-name').value.trim();
+    const phone = document.getElementById('h-phone').value.trim();
+    const persons = parseInt(document.getElementById('h-persons').value);
+    if (!name) return;
+    await api('register', { name, phone: phone || '0000000000', persons });
+    document.getElementById('h-name').value = '';
+    document.getElementById('h-phone').value = '';
+  };
+
+  window.toggleEdit = function(id) {
+    editingId = editingId === id ? null : id;
+    renderQueue();
+  };
+
+  window.saveEdit = async function(id) {
+    const name = document.getElementById(`en-${id}`).value;
+    const phone = document.getElementById(`ep-${id}`).value;
+    const persons = parseInt(document.getElementById(`eps-${id}`).value);
+    await api('edit', { id, name, phone, persons });
+    editingId = null;
+  };
+
+  window.reincorporate = async function(id) {
+    await api('reincorporate', { id });
+  };
+
+  window.removeFromQueue = async function(id) {
+    if (!confirm('¿Retirar este grupo de la lista?')) return;
+    await api('remove', { id });
+  };
+
+  window.exportCSV = function() {
+    const rows = [['Turno','Nombre','Celular','Personas','Hora','Estado','Incidencia']];
+    const sorted = getSorted();
+    sorted.forEach(([,item], i) => {
+      rows.push([i+1, item.name, item.phone, item.persons, item.time, item.status, item.incompleteAt ? 'Grupo incompleto registrado' : '—']);
+    });
+    const csv = rows.map(r => r.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `il-nonno-espera-${new Date().toLocaleDateString('es-CO').replace(/\//g,'-')}.csv`;
+    a.click(); URL.revokeObjectURL(url);
+  };
+
+  function getSorted() {
+    const all = Object.entries(queue).sort((a,b) => (a[1].createdAt||0)-(b[1].createdAt||0));
+    const active = all.filter(([,v]) => v.status !== 'seated' && v.status !== 'absent' && v.status !== 'incomplete');
+    const incomplete = all.filter(([,v]) => v.status === 'incomplete');
+    const done = all.filter(([,v]) => v.status === 'seated' || v.status === 'absent');
+    return [...active, ...incomplete, ...done];
+  }
+
+  function renderQueue() {
+    const sorted = getSorted();
+    const active = sorted.filter(([,v]) => v.status !== 'seated' && v.status !== 'absent' && v.status !== 'incomplete');
+    const incomplete = sorted.filter(([,v]) => v.status === 'incomplete');
+
+    document.getElementById('st-total').textContent = active.length;
+    document.getElementById('st-persons').textContent = active.reduce((a,[,b]) => a + (b.persons||0), 0);
+    document.getElementById('st-seated').textContent = sorted.filter(([,v]) => v.status === 'seated').length;
+
+    if (!sorted.length) {
+      document.getElementById('queue-list').innerHTML = '<div class="empty">Sin grupos registrados aún</div>';
+      return;
+    }
+
+    let html = '';
+    sorted.forEach(([id, item], idx) => {
+      const isActive = item.status !== 'seated' && item.status !== 'absent' && item.status !== 'incomplete';
+      const isNext = idx === 0 && isActive;
+      const isIncomplete = item.status === 'incomplete';
+      const isDone = item.status === 'seated' || item.status === 'absent';
+      const [blabel, bclass] = statusBadge(item.status);
+      const pos = active.findIndex(([i]) => i === id) + 1;
+      const tl2 = timeLeft(item.m2at, 2);
+      const tl4 = timeLeft(item.m3at, 4);
+      const fmt = (s) => `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+
+      html += `<div class="qcard ${isNext?'is-next':''} ${isIncomplete?'is-incomplete':''} ${isDone?'is-done':''}">
+        <div class="qcard-top">
+          <div>
+            <div class="qcard-name">${pos > 0 ? '#'+pos+' — ' : ''}${item.name}</div>
+            <div class="qcard-meta">
+              <span>👥 ${item.persons} pers.</span>
+              <span>🕐 ${item.time}</span>
+              <span>📱 ${item.phone}</span>
+            </div>
+            ${isIncomplete ? `<div class="incomplete-note">⚠ Pausado — esperando completar grupo</div>` : ''}
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+            <span class="badge ${bclass}">${blabel}</span>
+            ${!isDone ? `<button class="btn-act" style="font-size:11px;padding:5px 9px" onclick="toggleEdit('${id}')">✏ Editar</button>` : ''}
+          </div>
+        </div>`;
+
+      if (editingId === id) {
+        html += `<div class="edit-row">
+          <input id="en-${id}" type="text" value="${item.name}" placeholder="Nombre" />
+          <input id="ep-${id}" type="tel" value="${item.phone}" placeholder="Celular" style="max-width:140px" />
+          <select id="eps-${id}">${[1,2,3,4,5,6].map(n=>`<option ${n==item.persons?'selected':''}>${n}</option>`).join('')}</select>
+          <button class="btn-act verde" onclick="saveEdit('${id}')">✓ Guardar</button>
+        </div>`;
+      }
+
+      html += '<div class="actions">';
+
+      // Botón grupo incompleto — disponible en wait, soon, ready
+      if (['wait','soon','ready'].includes(item.status)) {
+        html += `<button class="btn-act amber" onclick="sendMsg('${id}','incomplete')">⚠ Grupo incompleto</button>`;
+      }
+
+      // Reactivar grupo incompleto
+      if (item.status === 'incomplete') {
+        html += `<button class="btn-act verde" onclick="sendMsg('${id}','reactivated')">✓ Grupo completo — reactivar</button>`;
+      }
+
+      // Flujo normal
+      if (item.status === 'wait') {
+        html += `<button id="btn-m2-${id}" class="btn-act" onclick="sendMsg('${id}','m2')">🔔 Próximos (M2)</button>`;
+      }
+      if (item.status === 'soon') {
+        const dis = tl2 > 0 ? 'disabled' : '';
+        const lbl = tl2 > 0 ? `<span class="countdown">${fmt(tl2)}</span>` : '';
+        html += `<button id="btn-m3-${id}" class="btn-act amber" onclick="sendMsg('${id}','m3')" ${dis}>🔧 Mesa lista (M3) ${lbl}</button>`;
+      }
+      if (item.status === 'ready') {
+        const dis = tl4 > 0 ? 'disabled' : '';
+        const lbl = tl4 > 0 ? `<span class="countdown">${fmt(tl4)}</span>` : '';
+        html += `<button id="btn-m4-${id}" class="btn-act verde" onclick="sendMsg('${id}','m4')" ${dis}>✓ Acomodados (M4) ${lbl}</button>`;
+        html += `<button id="btn-m4b-${id}" class="btn-act rojo" onclick="sendMsg('${id}','m4b')" ${dis}>✕ No aparecieron (M4B) ${lbl}</button>`;
+      }
+      if (item.status === 'absent') {
+        html += `<button class="btn-act amber" onclick="reincorporate('${id}')">↩ Reincorporar al final</button>`;
+      }
+      if (!isDone) {
+        html += `<button class="btn-act rojo" onclick="removeFromQueue('${id}')">🗑 Retirar</button>`;
+      }
+
+      html += '</div></div>';
+    });
+
+    document.getElementById('queue-list').innerHTML = html;
+  }
+
+  function updateClock() {
+    const el = document.getElementById('header-time');
+    if (el) el.textContent = new Date().toLocaleString('es-CO', { weekday:'long', hour:'2-digit', minute:'2-digit' });
+  }
+
+  setInterval(() => { renderQueue(); updateClock(); }, 1000);
+  updateClock();
+</script>
+</body>
+</html>
