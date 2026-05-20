@@ -1,0 +1,19 @@
+{
+  "name": "il-nonno-espera-server",
+  "version": "1.0.0",
+  "description": "Servidor de lista de espera IL NONNO",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "firebase-admin": "^12.0.0",
+    "twilio": "^5.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  }
+}
