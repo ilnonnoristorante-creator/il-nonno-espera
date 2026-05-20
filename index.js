@@ -49,6 +49,12 @@ async function sendSMS(to, body) {
 
 app.get('/', (req, res) => res.send('IL NONNO servidor activo ✓'));
 
+// ─── Panel anfitrión ──────────────────────────────────────
+const path = require('path');
+app.get('/anfitrion', (req, res) => {
+  res.sendFile(path.join(__dirname, 'anfitrion.html'));
+});
+
 // Registrar cliente
 app.post('/register', async (req, res) => {
   try {
@@ -178,3 +184,4 @@ app.post('/sms-reply', async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`IL NONNO servidor corriendo en puerto ${PORT}`));
+
