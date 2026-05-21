@@ -62,6 +62,16 @@ app.post('/register', async (req, res) => {
     const ref = db.ref('queue');
     const snapshot = await ref.once('value');
     const existing = snapshot.val() || {};
+
+    // Verificar si el número ya tiene un registro activo
+    const activeStatuses = ['wait', 'soon', 'ready', 'incomplete'];
+    const duplicate = Object.values(existing).find(
+      item => item.phone === phone && activeStatuses.includes(item.status)
+    );
+    if (duplicate) {
+      return res.json({ ok: false, duplicate: true });
+    }
+
     const pos = Object.keys(existing).length + 1;
     const newEntry = {
       name, phone, persons,
@@ -184,4 +194,3 @@ app.post('/sms-reply', async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`IL NONNO servidor corriendo en puerto ${PORT}`));
-
