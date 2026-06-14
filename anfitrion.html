@@ -101,7 +101,7 @@
     <div class="add-row">
       <input id="h-name" type="text" placeholder="Nombre y apellido" />
       <input id="h-phone" type="tel" placeholder="Celular" style="max-width:150px" />
-      <select id="h-persons"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6</option></select>
+      <select id="h-persons"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option><option>13</option><option>14</option><option>15</option><option>16</option><option>17</option><option>18</option><option>19</option><option>20</option></select>
       <button class="btn-add" onclick="addManual()">+ Agregar</button>
     </div>
   </div>
@@ -199,8 +199,12 @@
     const name = document.getElementById(`en-${id}`).value;
     const phone = document.getElementById(`ep-${id}`).value;
     const persons = parseInt(document.getElementById(`eps-${id}`).value);
+    if (!name) return;
+    const btns = document.querySelectorAll('.btn-act.verde');
+    btns.forEach(b => { if(b.textContent.includes('Guardar')) { b.disabled = true; b.textContent = 'Guardando...'; } });
     await api('edit', { id, name, phone, persons });
     editingId = null;
+    renderQueue();
   };
 
   window.reincorporate = async function(id) {
@@ -281,7 +285,7 @@
         html += `<div class="edit-row">
           <input id="en-${id}" type="text" value="${item.name}" placeholder="Nombre" />
           <input id="ep-${id}" type="tel" value="${item.phone}" placeholder="Celular" style="max-width:140px" />
-          <select id="eps-${id}">${[1,2,3,4,5,6].map(n=>`<option ${n==item.persons?'selected':''}>${n}</option>`).join('')}</select>
+          <select id="eps-${id}">${Array.from({length:20},(_,i)=>i+1).map(n=>`<option ${n==item.persons?'selected':''}>${n}</option>`).join('')}</select>
           <button class="btn-act verde" onclick="saveEdit('${id}')">✓ Guardar</button>
         </div>`;
       }
